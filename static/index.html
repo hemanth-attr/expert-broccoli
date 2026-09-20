@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Agent Explainable Real-Time Snake Identification</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <h1>Multi-Agent Explainable Real-Time Snake Identification & Emergency Decision-Support System</h1>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Error State -->
+        <div id="error-container" class="error-banner hidden">
+            <span class="icon">❌</span>
+            <div class="error-text">
+                <h3 id="error-title">Analysis failed</h3>
+                <p id="error-message">Unable to connect to Snake AI backend.</p>
+            </div>
+        </div>
+
+        <!-- Initial Upload View -->
+        <section id="upload-view" class="view-section active">
+            <div class="upload-area" id="drop-zone">
+                <div class="upload-icon">🐍</div>
+                <h2>Upload Snake Image</h2>
+                <p>Drag & Drop Image Here</p>
+                <div class="divider">OR</div>
+                <input type="file" id="file-input" accept="image/jpeg, image/png, image/jpg" hidden>
+                <button class="btn btn-primary" id="btn-choose-file">Choose Image</button>
+            </div>
+        </section>
+
+        <!-- Preview View -->
+        <section id="preview-view" class="view-section hidden">
+            <h2>Selected Image</h2>
+            <div class="preview-container">
+                <img id="image-preview" src="" alt="Selected Snake Image">
+                <p id="file-name" class="file-name">filename.jpg</p>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-secondary" id="btn-remove">Remove Image</button>
+                <button class="btn btn-primary" id="btn-analyze">Analyze Snake</button>
+            </div>
+        </section>
+
+        <!-- Loading View -->
+        <section id="loading-view" class="view-section hidden">
+            <div class="loading-container">
+                <h2 class="pulse-text">🐍 ANALYZING SNAKE...</h2>
+                <ul class="loading-steps">
+                    <li class="step done">✓ Image received</li>
+                    <li class="step active">● Processing through Multi-Agent Pipeline...</li>
+                    <li class="step pending">○ Awaiting final coordinator response</li>
+                </ul>
+            </div>
+            
+            <div class="pipeline-visual">
+                <h3>Multi-Agent Pipeline</h3>
+                <div class="pipeline-flow">
+                    <div class="node">INPUT IMAGE</div>
+                    <div class="arrow">↓</div>
+                    <div class="node">DETECTION AGENT</div>
+                    <div class="arrow">↓</div>
+                    <div class="node">SPECIES AGENT</div>
+                    <div class="arrow">↓</div>
+                    <div class="node">UNCERTAINTY ENGINE</div>
+                    <div class="arrow">↓</div>
+                    <div class="node">VENOM KNOWLEDGE BASE</div>
+                    <div class="arrow">↓</div>
+                    <div class="node">XAI / GRAD-CAM</div>
+                    <div class="arrow">↓</div>
+                    <div class="node">ADVISORY AGENT</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Dashboard -->
+        <section id="results-view" class="view-section hidden">
+            <div class="dashboard-header" style="text-align:center; padding: 20px; background-color: var(--card-bg); border-radius: 8px; margin-bottom: 20px;">
+                <h2 style="color: var(--accent-color);">🐍 SNAKE AI ANALYSIS RESULT</h2>
+            </div>
+
+            <!-- No Snake State -->
+            <div id="no-snake-state" class="card error-banner hidden" style="text-align:center; display:block;">
+                <h2 style="color: var(--error-color);">NO SNAKE DETECTED</h2>
+                <p>The system could not verify a snake in this image.</p>
+                <ul style="list-style: none; margin-top: 15px; color: var(--text-secondary);">
+                    <li>Species identification: Not evaluated</li>
+                    <li>Venom status: Unknown</li>
+                    <li>Advisory: No emergency snake-specific advisory generated.</li>
+                </ul>
+            </div>
+
+            <div class="dashboard-grid" id="main-results-grid">
+                <div class="card img-card">
+                    <h3>🔍 SNAKE VERIFICATION</h3>
+                    <div class="verification-info" style="margin-bottom: 15px; padding: 10px; background-color: var(--card-bg); border-left: 4px solid var(--primary-color);">
+                        <p id="verification-status" style="font-weight: bold; margin-bottom: 5px;">VERIFYING...</p>
+                        <p id="verification-reason" style="font-size: 0.9em; color: var(--text-secondary);"></p>
+                    </div>
+                    
+                    <div id="classification-only-warning" class="hidden" style="background-color: var(--warning-color); color: #000; padding: 10px; border-radius: 4px; margin-bottom: 15px; font-weight: bold; text-align: center; font-size: 0.9em;">
+                        ⚠ Snake localization is not currently validated.
+                    </div>
+                    <div class="result-image-container" id="result-img-wrapper">
+                        <img id="result-image" src="" alt="Analyzed Image">
+                        <!-- Bounding box will be drawn here -->
+                        <div id="bounding-box" class="bounding-box hidden"></div>
+                    </div>
+                </div>
+
+                <!-- Species ID -->
+                <div class="card species-card">
+                    <h3>SPECIES IDENTIFICATION</h3>
+                    <h2 id="top-species" class="highlight-text">--</h2>
+                    <p class="confidence-main">Classifier Confidence: <span id="top-conf">--%</span></p>
+                    
+                    <div class="progress-bar-container">
+                        <div id="top-conf-bar" class="progress-bar" style="width: 0%"></div>
+                    </div>
+                    <p style="font-size: 0.8em; color: var(--text-secondary); margin-top: 10px; margin-bottom: 10px;">
+                        <em>* Classifier confidence does not guarantee correct identification, especially for images outside the training distribution.</em>
+                    </p>
+                    
+                    <div class="confidence-bar-bg">
+                        <h4>Top Predictions</h4>
+                        <ol id="alt-list" class="alt-list">
+                            <!-- Populated via JS -->
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Venom Status -->
+                <div class="card venom-card">
+                    <h3>VENOM STATUS</h3>
+                    <div class="venom-result" id="venom-result-box">
+                        <h2 id="venom-status-text">--</h2>
+                    </div>
+                    <p class="source-text">Source: <span id="venom-source">Knowledge Base</span></p>
+                </div>
+
+                <!-- Uncertainty -->
+                <div class="card uncertainty-card">
+                    <h3>UNCERTAINTY</h3>
+                    <h2 id="uncertainty-level" class="highlight-text">--</h2>
+                    <p id="advisory-allowed-text">Advisory allowed: --</p>
+                </div>
+            </div>
+
+            <!-- XAI Section -->
+            <div id="xai-main-section" class="xai-section mt-4">
+                <h2 style="border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px;">EXPLAINABLE AI</h2>
+                
+                <div class="xai-tabs">
+                    <button class="tab-btn active" data-target="xai-original">Original</button>
+                    <button class="tab-btn" data-target="xai-gradcam">Grad-CAM</button>
+                    <button class="tab-btn" data-target="xai-side">Side-by-Side</button>
+                </div>
+
+                <div class="xai-content">
+                    <div id="xai-original" class="xai-pane active">
+                        <img id="xai-img-orig" src="" alt="Original">
+                    </div>
+                    <div id="xai-gradcam" class="xai-pane">
+                        <img id="xai-img-heatmap" src="" alt="Grad-CAM Heatmap">
+                        <p class="text-sm mt-2">Grad-CAM provides a visual representation of image regions associated with the model's prediction.</p>
+                    </div>
+                    <div id="xai-side" class="xai-pane flex-row">
+                        <div class="half-pane">
+                            <h4>Original Image</h4>
+                            <img id="xai-img-orig-side" src="" alt="Original">
+                        </div>
+                        <div class="half-pane">
+                            <h4>Grad-CAM</h4>
+                            <img id="xai-img-heatmap-side" src="" alt="Grad-CAM">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Advisory Section -->
+            <div id="advisory-section" class="advisory-section mt-4 hidden">
+                <h2 style="border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px;">EMERGENCY DECISION SUPPORT</h2>
+                <div class="advisory-box" id="advisory-box">
+                    <h3 id="advisory-type">🚨 EMERGENCY MEDICAL ADVISORY</h3>
+                    <p id="advisory-message">--</p>
+                </div>
+                <p class="disclaimer">Decision-support prototype. Not a substitute for professional medical diagnosis or treatment.</p>
+            </div>
+
+            <div class="actions-footer mt-4">
+                <button class="btn btn-primary btn-large" id="btn-reset">Analyze Another Image</button>
+            </div>
+
+            <!-- Debug Panel -->
+            <div class="debug-panel mt-4">
+                <button class="debug-toggle" id="btn-debug-toggle">▼ Developer Response</button>
+                <div class="debug-content hidden" id="debug-content">
+                    <pre><code id="json-output"></code></pre>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

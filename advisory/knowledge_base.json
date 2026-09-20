@@ -1,0 +1,43 @@
+{
+    "venomous_species": [
+        "COBRA_VENOUMOUS",
+        "COMMON_KRAIT-VENOMOUS",
+        "INDIAN_CAT_VEN",
+        "PIT_VIPPER_VENOMOUS",
+        "RUSSELL_VIPPER_VENOMOUS",
+        "SAW_SCALED_VIPPER_VENOMOUS"
+    ],
+    "non_venomous_species": [
+        "BLACK_HEADED_ROYAL_SNAKE_NON-VENOUMOUS",
+        "COMMON_TRINKET_NON-VENOUMOUS",
+        "INDIAN_BOA_NON-VENOUMOUS",
+        "KEELBACK_NON-VENOMOUS",
+        "KUKRI_NON-VENOMOUS",
+        "PYTHON_NON-VENOMOUS",
+        "RACER_SNAKE_NON-VENOMOUS",
+        "RAT_SNAKE_NON-VENOMOUS",
+        "WOLF_SNAKE_NON-VENOMOUS"
+    ],
+    "advisory_rules": {
+        "venomous_high_confidence": {
+            "type": "EMERGENCY_MEDICAL_ADVISORY",
+            "message": "CRITICAL: A potentially life-threatening venomous snake has been identified with high confidence. SEEK IMMEDIATE PROFESSIONAL MEDICAL HELP. Do not try to capture or kill the snake. Keep the victim calm and still to slow the spread of venom. Remove any tight clothing or jewelry near the bite area."
+        },
+        "venomous_low_confidence": {
+            "type": "URGENT_MEDICAL_ADVISORY",
+            "message": "WARNING: The model suspects a venomous snake, but confidence is low. Treat this as an emergency. Seek medical attention immediately for evaluation by a healthcare professional."
+        },
+        "non_venomous_high_confidence": {
+            "type": "PRECAUTIONARY_ADVISORY",
+            "message": "The snake is identified as non-venomous with high confidence. However, any animal bite can cause infection or allergic reactions. Wash the wound with soap and water, and consult a doctor if you experience pain, swelling, or signs of infection."
+        },
+        "non_venomous_low_confidence": {
+            "type": "CAUTIONARY_ADVISORY",
+            "message": "The model suspects a non-venomous snake, but confidence is low. Do NOT rely on this prediction for safety. If bitten, seek medical advice immediately to rule out venomous bites."
+        },
+        "unknown_or_insufficient_confidence": {
+            "type": "INSUFFICIENT_CONFIDENCE_ADVISORY",
+            "message": "DANGER: The system cannot confidently identify the snake. Assume the worst. If someone has been bitten, treat it as a medical emergency and go to the nearest hospital."
+        }
+    }
+}
